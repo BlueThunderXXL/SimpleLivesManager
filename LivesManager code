@@ -1,0 +1,75 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using System.Collections;
+
+public class LivesManager : MonoBehaviour 
+{
+    //ako će trebati vratiti živote na stari sistem uncomment ovo dole i liniju 31
+    //public int startingLives;
+    private int livesCounter;
+
+    private Text theText;
+
+    //znam da se da isčitat ali rekli smo da ćemo više komentirat pa čisto da
+    //naglasim kako odavdje kreće paljenje Game Over screena
+    public GameObject gameOverScreen;
+    public PlayerController player;
+
+    //nakon što bude game over ovo vodi u main menu
+    //odnosno, mainMenu string, samo u nju, postavimo što želimo kao scena nakon GO
+    public string mainMenu;
+    public float waitAfterGameOver;
+
+	// Use this for initialization
+	void Start () 
+    {
+        theText = GetComponent<Text>();
+        
+        //ovo je za osigurat se da je lives counter isti ko starting lives
+        livesCounter = PlayerPrefs.GetInt("PlayerCurrentLives");
+        //livesCounter = startingLives;
+
+        player = FindObjectOfType<PlayerController>();
+	
+	}
+	
+	// Update is called once per frame
+	void Update () 
+    {
+        //game over screen
+        if(livesCounter < 0)
+        {
+            gameOverScreen.SetActive(true);
+            player.gameObject.SetActive(false);
+        }
+
+	    //da se pokazuje koliko života imamo
+        theText.text = "x" + livesCounter;
+
+        if(gameOverScreen.activeSelf)
+        {
+            waitAfterGameOver -= Time.deltaTime;
+        }
+
+        if(waitAfterGameOver < 0)
+        {
+            SceneManager.LoadScene(mainMenu);
+        }
+	}
+
+    //naredna 2 voida određuju davanje i oduzimanje života
+    
+    public void GiveLife()
+    {
+        livesCounter++;
+        PlayerPrefs.SetInt("PlayerCurrentLives", livesCounter);
+    }
+
+    public void TakeLife()
+    {
+        livesCounter--;
+        PlayerPrefs.SetInt("PlayerCurrentLives", livesCounter);
+    }
+}
+
